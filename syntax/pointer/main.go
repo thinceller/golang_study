@@ -6,6 +6,7 @@ import (
 
 func main() {
 	n := 100
+	fmt.Println(&n)
 	// 値渡し
 	// コピーされるので、元のnに変化はない
 	returnValue := increment(n)
@@ -18,8 +19,10 @@ func main() {
 }
 
 func increment(n int) int {
+	fmt.Println(&n)
 	return n + 1
 }
 func incrementWithPointer(n *int) {
+	fmt.Println(n)
 	*n++
 }
