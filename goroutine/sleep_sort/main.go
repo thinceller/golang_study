@@ -10,6 +10,7 @@ import (
 var mu sync.Mutex
 
 func main() {
+	var wg sync.WaitGroup
 	nums := []int{1, 3, 2, 5, 4}
 
 	// mutexを使わずにChannelを使う方が楽
@@ -17,6 +18,7 @@ func main() {
 	sortedNums := make([]int, 0, len(nums))
 
 	for _, num := range nums {
+		wg.Add(1)
 		// goroutineでは無名関数も使える
 		// ここでnumを渡す事で、forが進んでも各Goroutineのスコープ内でnは変化しない。
 		go func(n int) {
@@ -26,12 +28,15 @@ func main() {
 			// 他のGoroutineからのアクセスがブロックされる
 			mu.Lock()
 			// deferで必ずUnlockする
-			defer mu.Unlock()
+			defer func() {
+				mu.Unlock()
+				wg.Done()
+			}()
 			sortedNums = append(sortedNums, n)
 		}(num) // (num)が無名関数の引数
 	}
 
-	time.Sleep(6 * time.Second)
+	wg.Wait()
 	fmt.Println(sortedNums)
 
 }
